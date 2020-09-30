@@ -1,8 +1,5 @@
-event publishing ???
 thread backend
-create abstractions above std libraries
-add examples
-document code
+comment code
 fix memory leaks
 add tests
 add job pool

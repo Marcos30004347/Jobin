@@ -19,19 +19,21 @@
 using cross_fiber = fiber_t;
 #endif
 
-
-
 #ifdef FIBER_CROSS_BACKEND
 static atomic<fiber_t*> primary {nullptr};
 #endif
 
+
+
 class fiber;
 
+#ifdef FIBER_FCONTEXT_BACKEND
 struct context_switch_data {
     fiber* to;
     fiber* from;
     context_switch_data(fiber* _from, fiber* _to): to {_to}, from {_from} {}
 };
+#endif
 
 class fiber {
 private:
@@ -39,30 +41,21 @@ private:
     void* args;
 
     #ifdef FIBER_FCONTEXT_BACKEND
-
     fcontext_t ctx;
     fcontext_stack_t stack =  { nullptr, 0 };
     friend void fiber_entry(fcontext_transfer_t caller);
     friend void fiber_to_thread_entry(fcontext_transfer_t caller);
-
     #elif FIBER_WINDOWS_BACKEND
-    
     void* stack;
     unsigned int stack_size;
     void* ctx;
     friend void fib_handle(void* fib);
-
     #elif FIBER_EMSCRIPTEN_BACKEND
-
     emscripten_fiber_t* ctx = nullptr;
-
     #elif FIBER_CROSS_BACKEND
-
     cross_fiber* ctx;
-
     #endif
-
-    friend fiber* create_fiber(void(*handle)(void*), void* args);
+    friend fiber* create_fiber();
     friend void init_fiber(fiber* fib, void(*handle)(void*), void* args);
     friend void convert_thread_to_fiber(fiber* fib,  void(*handle)(void*), void* arg);
     friend void switch_to_fiber(fiber* from, fiber* to);
@@ -71,7 +64,6 @@ private:
     friend void create_fiber_stack(fiber* fib, unsigned int stack_size);
     friend void destroy_fiber_stack(fiber* fib);
 
-public:
     #ifdef FIBER_FCONTEXT_BACKEND
     fiber(): ctx{nullptr}, stack{ nullptr,0 }, handle{ nullptr }, args{ 0 } {}
     #elif FIBER_WINDOWS_BACKEND
@@ -90,7 +82,13 @@ thread_local static fiber* current_fiber = nullptr;
 void fiber_entry(fcontext_transfer_t caller) {
     context_switch_data* data = reinterpret_cast<context_switch_data*>(caller.data);
     data->from->ctx = caller.ctx;
-    data->to->handle(data->to->args);
+
+    void(*handle)(void*) = data->to->handle;
+    void* args = data->to->args;
+
+    delete data;
+
+    handle(args);
 }
 
 void fiber_to_thread_entry(fcontext_transfer_t caller) {
@@ -120,6 +118,8 @@ void switch_to_fiber(fiber* from, fiber* to) {
     data = reinterpret_cast<context_switch_data*>(returner.data);
     data->from->ctx = returner.ctx;
 
+    delete data;
+
     #elif FIBER_WINDOWS_BACKEND
 
     SwitchToFiber(to->ctx);
@@ -141,6 +141,7 @@ void create_fiber_stack(fiber* fib, unsigned int stack_size = 1024 * 60) {
     if(fib->stack.ssize) {
         destroy_fcontext_stack(&fib->stack);
     }
+
     fib->stack = create_fcontext_stack(stack_size);
     #elif FIBER_WINDOWS_BACKEND
     fib->stack = _malloca(stack_size);;
@@ -155,7 +156,6 @@ void create_fiber_stack(fiber* fib, unsigned int stack_size = 1024 * 60) {
     // Stack managed by the fiber api
     #endif
 }
-
 void destroy_fiber_stack(fiber* fib) {
     #ifdef FIBER_FCONTEXT_BACKEND
     destroy_fcontext_stack(&fib->stack);
@@ -170,7 +170,7 @@ void destroy_fiber_stack(fiber* fib) {
 }
 
 void init_fiber(fiber* fib, void(*handle)(void*), void* args) {
-
+    if(!current_fiber) abort();
     fib->args = args;
     fib->handle = handle;
     create_fiber_stack(fib);
@@ -194,16 +194,12 @@ void init_fiber(fiber* fib, void(*handle)(void*), void* args) {
     #endif
 }
 
-fiber* create_fiber(void(*handle)(void*), void* args) {
-    fiber* fib = new fiber;
-    init_fiber(fib, handle, args);
+fiber* create_fiber() {
+    fiber* fib = new fiber();
     return fib;
 }
 
 void reset_fiber(fiber* fib, void(*handle)(void*), void* args) {
-    fib->args = args;
-    fib->handle = handle;
-
     #ifdef FIBER_FCONTEXT_BACKEND
     fib->ctx = make_fcontext(fib->stack.sptr, fib->stack.ssize, fiber_entry);
     #elif FIBER_WINDOWS_BACKEND
@@ -225,6 +221,9 @@ void reset_fiber(fiber* fib, void(*handle)(void*), void* args) {
     if(fib->ctx) fiber_delete(fib->ctx);
     fib->ctx = fiber_create(primary.load(), 1024*60, fib_handle, fib);
     #endif
+
+    fib->args = args;
+    fib->handle = handle;
 }
 
 void convert_thread_to_fiber(fiber* fib, void(*handle)(void*), void* arg) {
@@ -266,7 +265,7 @@ fiber* get_current_fiber() {
 void destroy_fiber(fiber* fib) {
     destroy_fiber_stack(fib);
     #ifdef FIBER_FCONTEXT_BACKEND
-    // delete fib;
+    delete fib;
     #elif FIBER_WINDOWS_BACKEND
     DeleteFiber(fib->ctx);
     #elif FIBER_EMSCRIPTEN_BACKEND
