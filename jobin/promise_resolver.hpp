@@ -1,11 +1,7 @@
 #ifndef JOBIN_PROMISE_RESOLVER_H
 #define JOBIN_PROMISE_RESOLVER_H
 
-#include <tuple>
-#include "atomic.hpp"
 #include "promise.hpp"
-
-
 
 /*
 template params:
@@ -19,28 +15,69 @@ private:
     Ret(*handle)(Args...);
 
     template<std::size_t... Is>
-    inline Ret call(const std::tuple<Args...>& tuple, std::index_sequence<Is...>) noexcept {
-        return handle(std::get<Is>(tuple)...);
+    inline Ret invoke(const std::tuple<Args...>& tuple, std::index_sequence<Is...>) noexcept {
+        return std::forward<Ret>(handle(std::get<Is>(tuple)...));
     }
 
 public:
     promise_resolver(Ret(*handle)(Args...)): handle{handle} {}
 
-    inline void set_args(Args ... values) {
-        arguments = std::tuple<Args...>(values...);
+    inline void set_args(Args ... values) noexcept {
+        arguments =std::tuple<Args...>(std::forward<Args>(values)...);
     }
 
-    inline void set_args(std::tuple<Args...> args) {
+    inline void set_args(std::tuple<Args...>&& args) noexcept {
         arguments = args;
     }
 
-    static void resolve(promise<Ret>* p, promise_resolver<Ret, Args...>& inv) noexcept {
-        p->promise_value = inv.call(inv.arguments, std::index_sequence_for<Args...>{});
+    static void resolve_with_resolver(promise<Ret>* p, promise_resolver<Ret, Args...>* inv) noexcept {
+        p->set_value(std::forward<Ret>(inv->invoke(std::forward<std::tuple<Args...>>(inv->arguments), std::index_sequence_for<Args...>{})));
+        p->is_resolved = true;
+    }
+
+    void resolve(promise<Ret>* p) noexcept {
+        p->set_value(std::forward<Ret>(invoke(std::forward<std::tuple<Args...>>(arguments), std::index_sequence_for<Args...>{})));
         p->is_resolved = true;
     }
 
 
 };
+
+
+template<typename... Args>
+class promise_resolver<void, Args...> {
+private:
+    std::tuple<Args...> arguments;
+    void(*handle)(Args...);
+
+    template<std::size_t... Is>
+    inline void invoke(const std::tuple<Args...>& tuple, std::index_sequence<Is...>) noexcept {
+        handle(std::get<Is>(tuple)...);
+    }
+
+public:
+    promise_resolver(void(*handle)(Args...)): handle{handle} {}
+
+    inline void set_args(Args ... values) noexcept {
+        arguments = std::tuple<Args...>(std::forward<Args>(values)...);
+    }
+
+    inline void set_args(std::tuple<Args...>&& args) noexcept {
+        arguments = args;
+    }
+
+    static void resolve_with_resolver(promise<void>* p, promise_resolver<void, Args...>* inv) noexcept {
+        inv->invoke(inv->arguments, std::index_sequence_for<Args...>{});
+        p->is_resolved = true;
+    }
+
+    void resolve(promise<void>* p) noexcept {
+        invoke(arguments, std::index_sequence_for<Args...>{});
+        p->is_resolved = true;
+    }
+
+};
+
 
 
 #endif

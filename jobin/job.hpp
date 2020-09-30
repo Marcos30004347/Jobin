@@ -49,7 +49,7 @@ class job {
         resolver->set_args(std::forward<Args>(args)...);
         resolver_ptr = resolver;
         promise_ptr = promise;
-        handler = reinterpret_cast<job_invoke_method>(resolver->resolve);
+        handler = reinterpret_cast<job_invoke_method>(resolver->resolve_with_resolver);
     }
 
     template<typename Ret, typename ...Args>
@@ -58,7 +58,7 @@ class job {
         resolver->set_args(std::forward<std::tuple<Args...>>(args));
         resolver_ptr = resolver;
         promise_ptr = promise;
-        handler = reinterpret_cast<job_invoke_method>(resolver->resolve);
+        handler = reinterpret_cast<job_invoke_method>(resolver->resolve_with_resolver);
     }
 
 
