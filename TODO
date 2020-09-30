@@ -1,0 +1,9 @@
+event publishing ???
+thread backend
+create abstractions above std libraries
+add examples
+document code
+fix memory leaks
+add tests
+add job pool
+add job priority
