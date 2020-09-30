@@ -71,12 +71,15 @@ atomic<unsigned int> memory::total_memory{0};
 #endif
 
 /*
-    Overload new and delete operators,
+    Overload new operator.
 */
 void* operator new(size_t size){
     return memory::allocate(size);
 }
 
+/*
+    Overload delete operator.
+*/
 void operator delete(void* ptr) {
     return memory::deallocate(ptr);
 }
