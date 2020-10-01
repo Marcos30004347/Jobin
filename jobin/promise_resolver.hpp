@@ -10,6 +10,8 @@ template params:
 */
 template<typename Ret, typename... Args>
 class promise_resolver {
+friend class job;
+
 private:
     std::tuple<Args...> arguments;
     Ret(*handle)(Args...);
@@ -20,26 +22,21 @@ private:
     }
 
 public:
-    promise_resolver(Ret(*handle)(Args...)): handle{handle} {}
+    promise_resolver(Ret(*handle)(Args...)) noexcept: handle{handle} {}
 
-    inline void set_args(Args ... values) noexcept {
-        arguments =std::tuple<Args...>(std::forward<Args>(values)...);
+    inline void set_args(Args... values) noexcept {
+        arguments = std::tuple<Args...>(std::forward<Args>(values)...);
     }
 
     inline void set_args(std::tuple<Args...>&& args) noexcept {
         arguments = args;
     }
 
+
     static void resolve_with_resolver(promise<Ret>* p, promise_resolver<Ret, Args...>* inv) noexcept {
         p->set_value(std::forward<Ret>(inv->invoke(std::forward<std::tuple<Args...>>(inv->arguments), std::index_sequence_for<Args...>{})));
         p->is_resolved = true;
     }
-
-    void resolve(promise<Ret>* p) noexcept {
-        p->set_value(std::forward<Ret>(invoke(std::forward<std::tuple<Args...>>(arguments), std::index_sequence_for<Args...>{})));
-        p->is_resolved = true;
-    }
-
 
 };
 
@@ -56,9 +53,9 @@ private:
     }
 
 public:
-    promise_resolver(void(*handle)(Args...)): handle{handle} {}
+    promise_resolver(void(*handle)(Args...)) noexcept: handle{handle} {}
 
-    inline void set_args(Args ... values) noexcept {
+    inline void set_args(Args... values) noexcept {
         arguments = std::tuple<Args...>(std::forward<Args>(values)...);
     }
 
@@ -66,15 +63,11 @@ public:
         arguments = args;
     }
 
-    static void resolve_with_resolver(promise<void>* p, promise_resolver<void, Args...>* inv) noexcept {
+    inline static void resolve_with_resolver(promise<void>* p, promise_resolver<void, Args...>* inv) noexcept {
         inv->invoke(inv->arguments, std::index_sequence_for<Args...>{});
         p->is_resolved = true;
     }
 
-    void resolve(promise<void>* p) noexcept {
-        invoke(arguments, std::index_sequence_for<Args...>{});
-        p->is_resolved = true;
-    }
 
 };
 

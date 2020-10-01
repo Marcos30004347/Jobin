@@ -3,11 +3,12 @@
 
 #include "spin_lock.hpp"
 // #include<mutex>
+#include<iostream>
 
 template<typename T, unsigned int size>
 class ring_buffer {
 
-    T* buff;
+    T buff[size];
     spin_lock mutex;
     // std::mutex mutex;
 
@@ -23,15 +24,11 @@ class ring_buffer {
 
 template<typename T, unsigned int size>
 ring_buffer<T,size>::ring_buffer(): mutex{} {
-    buff = new T[size+1];
+    // std::cout << "creating ring buffer" << std::endl;
 }
 
 template<typename T, unsigned int size>
-ring_buffer<T,size>::~ring_buffer() {
-    mutex.lock();
-    if(buff) delete buff;
-    mutex.unlock();
-}
+ring_buffer<T,size>::~ring_buffer() {}
 
 template<typename T, unsigned int size>
 bool ring_buffer<T,size>::enqueue(const T& data) {

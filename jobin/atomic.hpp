@@ -19,13 +19,13 @@ public:
     T load() { return _atomic.load();}
     void store(T value) { _atomic.store(value);}
 
-    atomic<T> operator=(T value) {
+    atomic<T>& operator=(T&& value) {
         return atomic<T>(value);
     }
 
-    atomic<T> operator=(atomic<T> other) {
-        return other;
-    }
+    // atomic<T> operator=(atomic<T> other) {
+    //     return other;
+    // }
 };
 
 #endif

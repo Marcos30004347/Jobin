@@ -37,11 +37,11 @@ static void wait(promise<T>* p) {
 }
 
 static int done(int i) {
-    worker::done();
+    worker::all_workers::done();
     return i;
 }
 
-static void init(int(*handler)(void* data), void* data) {
+static void init(void(*handler)(void* data), void* data) {
     job_manager::init();
     workers_count = thread::hardware_concurrency();
     workers = (worker**)malloc(sizeof(worker*)*workers_count - 1);
@@ -67,6 +67,21 @@ static void shut_down() {
 }
 
 };
+
+
+/*
+    Overload new operator.
+*/
+void* operator new(size_t size){
+    return malloc(size);
+}
+
+/*
+    Overload delete operator.
+*/
+void operator delete(void* ptr) {
+    return free(ptr);
+}
 
 
 #endif

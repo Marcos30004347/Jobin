@@ -47,18 +47,20 @@ public:
 
     job_manager() {}
 
+    ~job_manager() {
+        job* j;
+    
+        while(singleton_ptr->high_priority_queue.dequeue(j)) { delete j; }
+        while(singleton_ptr->medium_priority_queue.dequeue(j)) { delete j; }
+        while(singleton_ptr->low_priority_queue.dequeue(j)) { delete j; }
+    }
+
     static void init() {
         singleton_ptr = new job_manager();
     }
     
     static void shut_down() {
-        // waiting_job* tmp = singleton_ptr->waiting_list;
-        
-        // while(singleton_ptr->waiting_list) {
-        //     tmp = singleton_ptr->waiting_list->parent;
-        //     delete singleton_ptr->waiting_list;
-        // }
-
+        // singleton_ptr->~job_manager();
         delete singleton_ptr;
     }
     

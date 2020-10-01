@@ -14,7 +14,7 @@
 #include"atomic.hpp"
 #endif
 
-
+#include<iostream>
 class memory {
     #ifdef RECORD_ALLOCATED_MEMORY_COUNT
     // current bytes allocated count.
@@ -28,6 +28,7 @@ public:
         @param size - size in bytes to allocate.
     */
     static void* allocate(size_t size){
+
         #ifdef RECORD_ALLOCATED_MEMORY_COUNT
         size_t *p = (size_t*)malloc(size + sizeof(size_t));
         p[0] = size;

@@ -23,8 +23,6 @@ using cross_fiber = fiber_t;
 static atomic<fiber_t*> primary {nullptr};
 #endif
 
-
-
 class fiber;
 
 #ifdef FIBER_FCONTEXT_BACKEND
@@ -55,6 +53,10 @@ private:
     #elif FIBER_CROSS_BACKEND
     cross_fiber* ctx;
     #endif
+
+    template<unsigned int size>
+    friend class fiber_pool_fixed;
+
     friend fiber* create_fiber();
     friend void init_fiber(fiber* fib, void(*handle)(void*), void* args);
     friend void convert_thread_to_fiber(fiber* fib,  void(*handle)(void*), void* arg);
@@ -109,10 +111,15 @@ void fib_handle(void* fib) {
 
 #endif
 
+
+/**
+ * Saves current context of @from and switch to @to context of execution.
+ * @param from: fiber to save the context.
+ * @param to: fiber to switch to.
+ */
 void switch_to_fiber(fiber* from, fiber* to) {
     current_fiber = to;
     #ifdef FIBER_FCONTEXT_BACKEND
-
     context_switch_data* data = new context_switch_data(from, to);
     fcontext_transfer_t returner = jump_fcontext(to->ctx, data);
     data = reinterpret_cast<context_switch_data*>(returner.data);
@@ -200,14 +207,17 @@ fiber* create_fiber() {
 }
 
 void reset_fiber(fiber* fib, void(*handle)(void*), void* args) {
+    if(!current_fiber) abort();
+
     #ifdef FIBER_FCONTEXT_BACKEND
+    
+    if(!fib->stack.ssize) create_fiber_stack(fib);
     fib->ctx = make_fcontext(fib->stack.sptr, fib->stack.ssize, fiber_entry);
+
     #elif FIBER_WINDOWS_BACKEND
     if(fib->ctx) { DeleteFiber(fib->ctx); }
     fib->ctx = CreateFiber(fib->stack_size, fib->stack, fib);
     #elif FIBER_EMSCRIPTEN_BACKEND
-    if(fib->stack) delete fib->stack;
-    if(fib->astack) delete fib->astack;
     emscripten_fiber_init(
         fib->ctx,
         fiber::callback,

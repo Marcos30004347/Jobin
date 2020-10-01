@@ -44,15 +44,11 @@ class fiber_pool_fixed {
     ~fiber_pool_fixed();
 
     bool release(fiber* &data);
-    bool request(fiber* &value, void(*handle)(void*), void* args);
+    fiber* request();
 };
 
 template<unsigned int size>
-fiber_pool_fixed<size>::fiber_pool_fixed(): avaliable_ids{} {
-    for(int i=0; i<size; i++) {
-        init_fiber(&buff[i],[](void *data){}, nullptr);
-    }
-}
+fiber_pool_fixed<size>::fiber_pool_fixed(): avaliable_ids{} {}
 
 template<unsigned int size>
 fiber_pool_fixed<size>::~fiber_pool_fixed() {
@@ -67,17 +63,14 @@ bool fiber_pool_fixed<size>::release(fiber* &data) {
 
     return true;
 }
-
 template<unsigned int size>
-bool fiber_pool_fixed<size>::request(fiber* &value, void(*handle)(void*), void* args) {
+fiber* fiber_pool_fixed<size>::request() {
     unsigned int id;
+    while(!avaliable_ids.get_avaliable(id)) {}
 
-    if(!avaliable_ids.get_avaliable(id)) {
-        return false;
-    }
-    value = buff + id;
-    reset_fiber(value, handle, args);
-    return true;
+    // value = buff + id;
+    // reset_fiber(value, handle, args);
+    return buff + id;
 }
 
 
