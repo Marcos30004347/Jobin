@@ -69,19 +69,20 @@ static void shut_down() {
 };
 
 
-/*
-    Overload new operator.
-*/
-void* operator new(size_t size){
-    return malloc(size);
-}
 
-/*
-    Overload delete operator.
-*/
-void operator delete(void* ptr) {
-    return free(ptr);
-}
+// /*
+//     Overload new operator.
+// */
+// void* operator new(size_t size){
+//     return malloc(size);
+// }
+
+// /*
+//     Overload delete operator.
+// */
+// void operator delete(void* ptr) {
+//     return free(ptr);
+// }
 
 
 #endif

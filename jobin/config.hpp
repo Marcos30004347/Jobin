@@ -16,7 +16,7 @@
 #if __EMSCRIPTEN__
 #define EMSCRIPTEN_PLATFORM
 #define EMSCRIPTEN_FIBER_BACKEND
-#elif __linux__
+#elif defined(__linux__) && !defined(__ANDROID__)
     #define THREAD_PTHREAD_BACKEND
     #define POSIX_PLATFORM
 
@@ -26,7 +26,7 @@
         #define FIBER_FCONTEXT_BACKEND 
     #endif
 #elif __ANDROID__
-    #define THREAD_PTHREAD_BACKEND
+    // #define THREAD_PTHREAD_BACKEND
     #define POSIX_PLATFORM
 
     #ifdef __arm__   //ARM

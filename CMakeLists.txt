@@ -22,7 +22,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${USE_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${USE_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${USE_FLAGS}")
 set(CMAKE_EXECUTABLE_SUFFIX .js)
-else()
+elseif()
 
 add_subdirectory(third-party/cross-fiber)
 add_subdirectory(third-party/fcontext)
@@ -32,6 +32,29 @@ target_link_libraries(jobin INTERFACE cross-fiber)
 target_link_libraries(jobin INTERFACE fcontext)
 target_link_libraries(jobin INTERFACE Threads::Threads)
 
+elseif (ANDROID)
+# Android
+
+message("Compiling for Android!")
+
+    add_subdirectory(third-party/fcontext)
+    find_package(Threads REQUIRED)
+    target_link_libraries(jobin INTERFACE Threads::Threads)
+    target_link_libraries(jobin INTERFACE fcontext)
+
+    if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
+        set(CPU_ARCH "arm")
+        set(ASM_EXT "aapcs_elf_gas.S")
+    elseif (${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")
+        set(CPU_ARCH "arm64")
+        set(ASM_EXT "aapcs_elf_gas.S")
+    elseif (${CMAKE_SYSTEM_PROCESSOR} MATCHES "i686")
+        set(CPU_ARCH "i386")
+        set(ASM_EXT "sysv_elf_gas.S")
+    elseif (${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
+        set(CPU_ARCH "x86_64")
+        set(ASM_EXT "sysv_elf_gas.S")
+    endif()
 endif()
 
 if(TESTS)

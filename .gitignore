@@ -3,3 +3,5 @@ obsolete/
 build/
 examples/
 sandbox/
+android/
+android-build/

@@ -12,6 +12,10 @@
 
 #include <assert.h>
 
+#if defined(ANDROID) || defined(__ANDROID__)
+#include<sched.h>
+#endif
+
 class thread {
     private:
     
@@ -74,7 +78,12 @@ class thread {
             auto ret = SetThreadAffinityMask(_thread.native_handle(), mask);
             if(!ret) return false;
             return true;
-        
+
+            #elif defined(ANDROID) || defined(__ANDROID__)
+            cpu_set_t my_set;
+            CPU_ZERO(&my_set);
+            CPU_SET(7, &my_set);
+            sched_setaffinity(0, sizeof(cpu_set_t), &my_set);
             #endif
         }
 
@@ -89,5 +98,3 @@ class thread {
 };
 
 #endif
-
-// #endif
