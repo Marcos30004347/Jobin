@@ -6,41 +6,51 @@ atomic<unsigned int> worker::running_workers{0};
 void worker::do_work(void *data) {
     worker* me = reinterpret_cast<worker*>(data);
     promise<void> promise_h;
-    if(me->handler) { job_manager::get_singleton_ptr()->enqueue_job<void, void*>(&promise_h, me->handler, me->arg);}
+    promise<void> promise_c;
+    std::cout << "===========" << std::endl;
+    if(me->handler) {
+        job_manager::enqueue_job<void, void*>(&promise_h, me->handler, me->arg);
+    }
+    std::cout << "===========" << std::endl;
 
-    do { me->id = worker::running_workers.load(); } while(!worker::running_workers.compare_exchange_weak(me->id, me->id+1));
-    
+    do {
+        me->id = worker::running_workers.load();
+    } while(!worker::running_workers.compare_exchange_weak(me->id, me->id+1));
     
     // while(worker::running_workers.load() < thread::hardware_concurrency()) {}
 
     thread::this_thread::set_affinity(me->id % thread::hardware_concurrency());
 
+    job* next_job = nullptr;
+
     while (!should_pool){}
 
     while(worker::should_pool) {
-        while(job_manager::get_singleton_ptr()->queues.dequeue(current_job)) {
-            if(current_job->status == job_status::UNINITIATED) {
-                current_job->pool = &me->fiber_pool;
-                current_job->context = me->fiber_pool.request();
-                reset_fiber(current_job->context, job::execute, current_job);
-                current_job->status = job_status::RUNNING;
+        while(job_manager::queues.dequeue(next_job)) {
+            set_current_job(next_job);
+            if(get_current_job()->status == job_status::UNINITIATED) {
+                get_current_job()->pool = &me->fiber_pool;
+                get_current_job()->context = me->fiber_pool.request();
+                reset_fiber(get_current_job()->context, job::execute, get_current_job());
+                get_current_job()->status = job_status::RUNNING;
             } else
-            if(current_job->status == job_status::WAITING) {
-                current_job->status = job_status::RUNNING;
+            if(get_current_job()->status == job_status::WAITING) {
+                get_current_job()->status = job_status::RUNNING;
             }
 
             // printf("worker %i is executing job %i...\n", me->id, current_job);
-            current_job->lock.lock();
-            switch_to_fiber(me->thread_fib, current_job->context);
+            get_current_job()->lock.lock();
 
-            // printf("worker %i return from job %p...\n", me->id, current_job);
-            current_job->lock.unlock();
+            // std::cout << current_job->context << std::endl;
+        
+            switch_to_fiber(me->thread_fib, get_current_job()->context);
 
-            if(current_job->status == job_status::FINISHING) {
-                current_job->pool->release(current_job->context);
-                delete current_job;
+            // printf("worker %i return from job %p...\n", me->id, get_current_job());
+            get_current_job()->lock.unlock();
+            if(get_current_job()->status == job_status::FINISHING) {
+                get_current_job()->pool->release(get_current_job()->context);
+                delete get_current_job();
             }
-
         }
     }
     // printf("worker %i is finishing...\n", me->id);
@@ -85,11 +95,11 @@ void worker::convert_thread_to_worker(void(*handler)(void*), void* arg) {
 
 
 void worker::all_workers::done() {
-    should_pool = false;
+    worker::should_pool = false;
 }
 
 void worker::all_workers::begin() {
-    should_pool = true;
+    worker::should_pool = true;
 }
 
 void return_to_worker() {
@@ -97,12 +107,11 @@ void return_to_worker() {
 }
 
 void notify_caller(job* job) {
-    if(job->waiting_for_me)
-    job_manager::get_singleton_ptr()->notify(job->waiting_for_me);
+    if(job->waiting_for_me) job_manager::notify(job->waiting_for_me);
 }
 
 void current_job_yield() {
-    job_manager::get_singleton_ptr()->queues.enqueue(current_job);
+    job_manager::queues.enqueue(get_current_job());
     return_to_worker();
 }
 

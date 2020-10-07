@@ -1,5 +1,5 @@
-// #define TESTS
-// #include "jobin/memory.hpp"
+#define TESTS
+#include "jobin/memory.hpp"
 #include "jobin/worker.hpp"
 #include "jobin/job_manager.hpp"
 
@@ -8,24 +8,25 @@
 
 
 int handle(int a, int b) {
-    printf("RODOU RODOU RODOU\n");
-
     return a+b;
 }
 
 void worker_handler(void* data) {
 
+
     promise<int> p;
-    job_manager::get_singleton_ptr()->enqueue_job(&p, handle, 1, 2);
+    
+
+    job_manager::enqueue_job(&p, handle, 1, 2);
 
     assert(p.is_resolved == false);
     p.wait();
     assert(p.is_resolved == true);
     assert(p.value() == 3);
 
-    std::cout << "AAAAAAAAA" << std::endl;
-    std::cout << "ESSE MEMO" << std::endl;
-    job_manager::get_singleton_ptr()->enqueue_job_and_wait(&p, handle, 1, 2);
+
+    job_manager::enqueue_job_and_wait(&p, handle, 1, 2);
+
     assert(p.value() == 3);
 
 
@@ -35,20 +36,16 @@ void worker_handler(void* data) {
     args[0] = {1, 2};
     args[1] = {2, 3};
 
-    job_manager::get_singleton_ptr()->enqueue_jobs(ps, handle, args, 2);
+    job_manager::enqueue_jobs(ps, handle, args, 2);
     ps[0].wait();
     ps[1].wait();
 
     assert(ps[0].value() == 3);
     assert(ps[1].value() == 5);
-    std::cout << "asdasdasdasd" << std::endl;
-    std::cout << "asdasdasdasd" << std::endl;
 
-    job_manager::get_singleton_ptr()->enqueue_jobs_and_wait(ps, handle, args, 2);
+    job_manager::enqueue_jobs_and_wait(ps, handle, args, 2);
     assert(ps[0].value() == 3);
     assert(ps[1].value() == 5);
-    std::cout << "asdasdasdasd" << std::endl;
-    std::cout << "asdasdasdasd" << std::endl;
 
 
     worker::all_workers::done();
@@ -66,11 +63,11 @@ int main() {
     assert(t == j);
 
     delete j;
-    // assert(memory::currently_allocated_memory_count() == 0);
-    job_manager::init();
+    assert(memory::currently_allocated_memory_count() == 0);
+
+
     worker::convert_thread_to_worker(worker_handler, nullptr);
 
-    // assert(memory::currently_allocated_memory_count() == 0);
-    job_manager::shut_down();
+    assert(memory::currently_allocated_memory_count() == 0); 
     return 0;
 }

@@ -41,7 +41,6 @@ static void done() {
 }
 
 static void init(void(*handler)(void* data), void* data) {
-    job_manager::init();
     workers_count = thread::hardware_concurrency();
     workers = (worker**)malloc(sizeof(worker*)*workers_count - 1);
         
@@ -58,7 +57,6 @@ static void wait_jobs() {
 }
 
 static void shut_down() {
-    job_manager::shut_down();
     for(int i=1; i<workers_count; i++) {
         workers[i]->~worker();
     }

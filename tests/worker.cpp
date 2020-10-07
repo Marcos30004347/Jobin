@@ -24,7 +24,6 @@ void worker_handler_1(void* data) {
 }
 
 int main() {
-    job_manager::init();
     worker::convert_thread_to_worker(worker_handler_0, nullptr);
 
     assert(worker_0 == true);
@@ -36,7 +35,6 @@ int main() {
     assert(worker_1 == true);
 
     worker1.~worker();
-    job_manager::shut_down();
     assert(memory::currently_allocated_memory_count() == 0);
     return 0;
 }

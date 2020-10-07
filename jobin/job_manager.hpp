@@ -14,7 +14,7 @@ public:
     waiting_job* next = nullptr;
     waiting_job* parent = nullptr;
 
-    waiting_job(job* job, int waiting_for): waiting_for{waiting_for}, ref{job} {}
+    waiting_job(job* j, int waiting_for): waiting_for{waiting_for}, ref{j} {}
     ~waiting_job() {}
 };
 
@@ -48,18 +48,18 @@ class job_manager {
     friend void current_job_yield();
     friend void notify_caller(job* job);
 
-    job_queues queues;
+    static job_queues queues;
 
-    static job_manager* singleton_ptr;
+    // static job_manager* singleton_ptr;
 
 private:
-    waiting_job* put_to_wait(job* w, int waiting_for) {
+    static waiting_job* put_to_wait(job* w, int waiting_for) {
         waiting_job* waiting = new waiting_job(w, waiting_for);
         
         return waiting; 
     }
 
-    void notify(waiting_job* ref) {
+    static void notify(waiting_job* ref) {
         int waiting;
         do {
             waiting = ref->waiting_for.load();
@@ -76,21 +76,22 @@ public:
     job_manager() = default;
     ~job_manager() = default;
 
-    static void init() { if(!singleton_ptr) singleton_ptr = new job_manager(); }
-    static void shut_down() { if(singleton_ptr) delete singleton_ptr; }
-    static job_manager* get_singleton_ptr() {
-        printf("ta tirano\n");
-        return singleton_ptr;
-    }
+    // static void init() { if(!singleton_ptr) singleton_ptr = new job_manager(); }
+    // static void shut_down() { if(singleton_ptr) delete singleton_ptr; }
+
+    // static job_manager* get_singleton_ptr() {
+    //     printf("ta tirano\n");
+    //     return singleton_ptr;
+    // }
 
     template<typename Ret, typename ...Args>
-    void enqueue_job(promise<Ret>* p, Ret(*handle)(Args...), Args... args) {
+    static void enqueue_job(promise<Ret>* p, Ret(*handle)(Args...), Args... args) {
         job* _j = new job(p, handle, args...);
         queues.enqueue(_j);
     }
 
     template<typename Ret, typename ...Args>
-    void enqueue_jobs(promise<Ret>* promises, Ret(*handle)(Args...), std::tuple<Args...> args[], unsigned int count) {
+    static void enqueue_jobs(promise<Ret>* promises, Ret(*handle)(Args...), std::tuple<Args...> args[], unsigned int count) {
         job* _j;
 
         for(int i=0; i<count; i++) {
@@ -100,8 +101,8 @@ public:
     }
 
     template<typename Ret, typename ...Args>
-    void enqueue_jobs_and_wait(promise<Ret>* promises, Ret(*handle)(Args...), std::tuple<Args...> args[], unsigned int count) {
-        waiting_job* ref = put_to_wait(current_job, count);
+    static void enqueue_jobs_and_wait(promise<Ret>* promises, Ret(*handle)(Args...), std::tuple<Args...> args[], unsigned int count) {
+        waiting_job* ref = put_to_wait(get_current_job(), count);
         job* _j;
     
         for(int i=0; i<count; i++) {
@@ -115,13 +116,9 @@ public:
 
 
     template<typename Ret, typename ...Args>
-    void enqueue_job_and_wait(promise<Ret>* p, Ret(*handle)(Args...), Args... args) {
-        printf("kkkkkk\n");
-        printf("kkkkkk\n");
-        printf("kkkkkk\n");
-        printf("kkkkkk\n");
+    static void enqueue_job_and_wait(promise<Ret>* p, Ret(*handle)(Args...), Args... args) {
         p->is_resolved = false;
-        waiting_job* ref = put_to_wait(current_job, 1);
+        waiting_job* ref = put_to_wait(get_current_job(), 1);
 
         job* J;
     
@@ -129,6 +126,7 @@ public:
         J->waiting_for_me = ref;
 
         queues.enqueue(J);
+
         return_to_worker();
     }
 };

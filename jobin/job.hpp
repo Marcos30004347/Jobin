@@ -12,11 +12,11 @@
 class job;
 class waiting_job;
 
-thread_local static job* current_job = nullptr;
-
 void return_to_worker();
 void notify_caller(job* job);
 void current_job_yield();
+job* get_current_job() noexcept;
+void set_current_job(job* j) noexcept;
 
 using job_invoke_method = unsigned int (*)(void*, void*);
 
@@ -43,6 +43,11 @@ class job {
     void* resolver_ptr = nullptr;
     void* promise_ptr = nullptr;
 
+    /**
+     * Execute @j job.
+     * @param j: job to execute.
+     */
+    static void execute(void* j);
     public:
 
 
@@ -78,6 +83,8 @@ class job {
         handler = reinterpret_cast<job_invoke_method>(resolver->resolve_with_resolver);
     }
 
+    job() {}
+
     /**
      * job destructor.
      */
@@ -85,22 +92,7 @@ class job {
         free(resolver_ptr);
     }
 
-    /**
-     * Execute @j job.
-     * @param j: job to execute.
-     */
-    static void execute(void* j) {
-        job* w = reinterpret_cast<job*>(j);
-        job_invoke_method call = (job_invoke_method)w->handler;
-        w->status = job_status::RUNNING;
-        call(w->promise_ptr, w->resolver_ptr);
-
-        w->status = job_status::FINISHING;
-        notify_caller(w);
-        return_to_worker();
-    }
 };
-
 
 
 #endif

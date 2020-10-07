@@ -1,4 +1,3 @@
-#include <iostream>
 #include <stdlib.h>
 
 #include "fiber.hpp"
@@ -12,7 +11,6 @@ void fiber_entry(fcontext_transfer_t caller) {
     void(*handle)(void*) = data->to->handle;
     void* args = data->to->args;
     delete data;
-    printf("PAROU\n");
     handle(args);
 }
 

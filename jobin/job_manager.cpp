@@ -1,3 +1,3 @@
 #include "job_manager.hpp"
 
-job_manager* job_manager::singleton_ptr = nullptr;
+job_queues job_manager::queues;
