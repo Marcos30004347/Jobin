@@ -26,6 +26,7 @@ class job {
     friend class job_manager;
     friend class job_waiting_list;
     friend class job_avaliable_queue;
+
     friend void notify_caller(job* job);
 
     waiting_job* waiting_for_me = nullptr;
@@ -91,7 +92,6 @@ class job {
     static void execute(void* j) {
         job* w = reinterpret_cast<job*>(j);
         job_invoke_method call = (job_invoke_method)w->handler;
-    
         w->status = job_status::RUNNING;
         call(w->promise_ptr, w->resolver_ptr);
 

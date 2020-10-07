@@ -5,3 +5,4 @@ examples/
 sandbox/
 android/
 android-build/
+.ignore/

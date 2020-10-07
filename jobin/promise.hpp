@@ -4,8 +4,6 @@
 #include <tuple>
 #include <type_traits>
 
-class job;
-
 template <typename T> struct trait {
     typedef T type;
     T value = T();
@@ -33,8 +31,6 @@ class promise {
 
     friend class job_manager;
     friend class job;
-
-    job* j;
 
     trait<T> promise_value;
 public:

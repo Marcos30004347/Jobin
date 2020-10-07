@@ -23,9 +23,6 @@ public:
         return atomic<T>(value);
     }
 
-    // atomic<T> operator=(atomic<T> other) {
-    //     return other;
-    // }
 };
 
 #endif

@@ -1,5 +1,6 @@
 #ifndef JOBIN_MUTEX_H
 #define JOBIN_MUTEX_H
+
 #include <mutex>
 
 class mutex {
@@ -13,13 +14,5 @@ class mutex {
     void lock();
     void unlock();
 };
-
-
-mutex::mutex() {}
-mutex::~mutex() { mut.~mutex(); }
-
-void mutex::lock() { mut.lock(); }
-void mutex::unlock() { mut.unlock(); }
-
 
 #endif

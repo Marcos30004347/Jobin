@@ -1,46 +1,55 @@
-#include "jobin/job_manager.hpp"
+// #define TESTS
+// #include "jobin/memory.hpp"
 #include "jobin/worker.hpp"
+#include "jobin/job_manager.hpp"
 
 #include <assert.h>
 #include <iostream>
 
-#define TESTS
-#include "jobin/memory.hpp"
 
 int handle(int a, int b) {
+    printf("RODOU RODOU RODOU\n");
+
     return a+b;
 }
 
 void worker_handler(void* data) {
 
-    promise<int>* p = job_manager::get_ptr()->enqueue_job(handle, 1, 2);
-    assert(p->is_resolved == false);
-    p->wait();
-    assert(p->is_resolved == true);
-    assert(p->value() == 3);
-    delete p;
+    promise<int> p;
+    job_manager::get_singleton_ptr()->enqueue_job(&p, handle, 1, 2);
 
-    p = job_manager::get_ptr()->enqueue_job_and_wait(handle, 1, 2);
-    assert(p->value() == 3);
-    delete p;
+    assert(p.is_resolved == false);
+    p.wait();
+    assert(p.is_resolved == true);
+    assert(p.value() == 3);
+
+    std::cout << "AAAAAAAAA" << std::endl;
+    std::cout << "ESSE MEMO" << std::endl;
+    job_manager::get_singleton_ptr()->enqueue_job_and_wait(&p, handle, 1, 2);
+    assert(p.value() == 3);
+
 
     std::tuple<int, int> args[2];
+    promise<int> ps[2]; 
+
     args[0] = {1, 2};
     args[1] = {2, 3};
 
-    promise<int>* ps = job_manager::get_ptr()->enqueue_jobs(handle, args, 2);
+    job_manager::get_singleton_ptr()->enqueue_jobs(ps, handle, args, 2);
     ps[0].wait();
     ps[1].wait();
 
     assert(ps[0].value() == 3);
     assert(ps[1].value() == 5);
-    delete ps;
+    std::cout << "asdasdasdasd" << std::endl;
+    std::cout << "asdasdasdasd" << std::endl;
 
-    ps = job_manager::get_ptr()->enqueue_jobs_and_wait(handle, args, 2);
+    job_manager::get_singleton_ptr()->enqueue_jobs_and_wait(ps, handle, args, 2);
     assert(ps[0].value() == 3);
     assert(ps[1].value() == 5);
+    std::cout << "asdasdasdasd" << std::endl;
+    std::cout << "asdasdasdasd" << std::endl;
 
-    delete ps;
 
     worker::all_workers::done();
 }
@@ -57,16 +66,11 @@ int main() {
     assert(t == j);
 
     delete j;
-    assert(memory::currently_allocated_memory_count() == 0);
-    assert(job_manager::get_ptr() == nullptr);
+    // assert(memory::currently_allocated_memory_count() == 0);
     job_manager::init();
-    assert(job_manager::get_ptr());
-
     worker::convert_thread_to_worker(worker_handler, nullptr);
 
+    // assert(memory::currently_allocated_memory_count() == 0);
     job_manager::shut_down();
-
-    assert(memory::currently_allocated_memory_count() == 0);
-
     return 0;
 }

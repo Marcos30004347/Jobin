@@ -2,10 +2,9 @@
 #define JOBIN_MANAGER_H
 
 #include <tuple>
-#include "job_priority_queue.hpp"
-#include "enums.hpp"
-#include "spin_lock.hpp"
 #include "job.hpp"
+#include "enums.hpp"
+#include "job_priority_queue.hpp"
 
 class waiting_job {
 public:
@@ -19,7 +18,6 @@ public:
     ~waiting_job() {}
 };
 
-#include<iostream>
 class job_queues {
 private:
     job_priority_queue high_priority_queue;
@@ -29,14 +27,9 @@ private:
 public:
     job_queues() {}
 
-    ~job_queues() {
-        job* j;
-        // while(high_priority_queue.dequeue(j)) { j->~job(); }
-        // while(medium_priority_queue.dequeue(j)) { j->~job(); }
-        // while(low_priority_queue.dequeue(j)) { j->~job(); }
-    }
+    ~job_queues() {}
 
-    bool enqueue(job* j) {
+    bool enqueue(job* const &j) {
         if(j->priority == job_prioriry::HIGH) return high_priority_queue.enqueue(j);
         else if(j->priority == job_prioriry::MEDIUM) return medium_priority_queue.enqueue(j);
         else return low_priority_queue.enqueue(j);
@@ -55,7 +48,9 @@ class job_manager {
     friend void current_job_yield();
     friend void notify_caller(job* job);
 
-    job_queues jobs;
+    job_queues queues;
+
+    static job_manager* singleton_ptr;
 
 private:
     waiting_job* put_to_wait(job* w, int waiting_for) {
@@ -71,81 +66,71 @@ private:
         } while(!ref->waiting_for.compare_exchange_weak(waiting, waiting - 1));
 
         if(waiting <= 1) {
-            jobs.enqueue(ref->ref);        
+            queues.enqueue(ref->ref);        
             delete ref;
         }
     }
 
 
 public:
-    spin_lock system_lock;
+    job_manager() = default;
+    ~job_manager() = default;
 
-    static job_manager* singleton_ptr;
-
-    job_manager() {}
-    ~job_manager() {}
-
-    inline static void init() noexcept { singleton_ptr = new job_manager(); }
-    inline static void shut_down() noexcept { delete singleton_ptr; }
-    inline static job_manager* get_ptr() noexcept { return singleton_ptr; }
-
-    template<typename Ret, typename ...Args>
-    promise<Ret>* enqueue_job(Ret(*handle)(Args...), Args... args) {
-        promise<Ret>* prm = new promise<Ret>;
-        job* _j = new job(prm, handle, args...);
-        jobs.enqueue(_j);
-        return prm;
+    static void init() { if(!singleton_ptr) singleton_ptr = new job_manager(); }
+    static void shut_down() { if(singleton_ptr) delete singleton_ptr; }
+    static job_manager* get_singleton_ptr() {
+        printf("ta tirano\n");
+        return singleton_ptr;
     }
 
     template<typename Ret, typename ...Args>
-    promise<Ret>* enqueue_jobs(Ret(*handle)(Args...), std::tuple<Args...> args[], unsigned int count) {
-        promise<Ret>* promises = new promise<Ret>[count];
+    void enqueue_job(promise<Ret>* p, Ret(*handle)(Args...), Args... args) {
+        job* _j = new job(p, handle, args...);
+        queues.enqueue(_j);
+    }
+
+    template<typename Ret, typename ...Args>
+    void enqueue_jobs(promise<Ret>* promises, Ret(*handle)(Args...), std::tuple<Args...> args[], unsigned int count) {
         job* _j;
 
         for(int i=0; i<count; i++) {
             _j = new job(&promises[i], handle, args[i]);
-            jobs.enqueue(_j);
+            queues.enqueue(_j);
         }
-
-        return promises;
     }
 
     template<typename Ret, typename ...Args>
-    promise<Ret>* enqueue_jobs_and_wait(Ret(*handle)(Args...), std::tuple<Args...> args[], unsigned int count) {
+    void enqueue_jobs_and_wait(promise<Ret>* promises, Ret(*handle)(Args...), std::tuple<Args...> args[], unsigned int count) {
         waiting_job* ref = put_to_wait(current_job, count);
-        promise<Ret>* promises = new promise<Ret>[count];
-
         job* _j;
     
         for(int i=0; i<count; i++) {
             _j = new job(&promises[i], handle, args[i]);
             _j->waiting_for_me = ref;
-            jobs.enqueue(_j);
+            queues.enqueue(_j);
         }
 
         return_to_worker();
-
-        return promises;
     }
 
 
     template<typename Ret, typename ...Args>
-    promise<Ret>* enqueue_job_and_wait(Ret(*handle)(Args...), Args... args) {
+    void enqueue_job_and_wait(promise<Ret>* p, Ret(*handle)(Args...), Args... args) {
+        printf("kkkkkk\n");
+        printf("kkkkkk\n");
+        printf("kkkkkk\n");
+        printf("kkkkkk\n");
+        p->is_resolved = false;
         waiting_job* ref = put_to_wait(current_job, 1);
-        promise<Ret>* p = new promise<Ret>();
 
-        job* _j;
+        job* J;
     
-        _j = new job(p, handle, args...);
-        _j->waiting_for_me = ref;
+        J = new job(p, handle, args...);
+        J->waiting_for_me = ref;
 
-        jobs.enqueue(_j);
+        queues.enqueue(J);
         return_to_worker();
-
-        return p;
     }
 };
-
-job_manager* job_manager::singleton_ptr = nullptr;
 
 #endif
