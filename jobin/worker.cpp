@@ -1,17 +1,28 @@
 #include "worker.hpp"
+#include "job_manager.hpp"
+#include "fiber_pool_fixed.hpp"
 
 bool worker::should_pool = false;
+
 atomic<unsigned int> worker::running_workers{0};
+
+/**
+ * thread context of execution.
+ */
+thread_local fiber* thread_fib = nullptr;
+
+/**
+ * worker fiber pool.
+ */
+thread_local fiber_pool_fixed<256> fiber_pool;
 
 void worker::do_work(void *data) {
     worker* me = reinterpret_cast<worker*>(data);
     promise<void> promise_h;
     promise<void> promise_c;
-    std::cout << "===========" << std::endl;
     if(me->handler) {
         job_manager::enqueue_job<void, void*>(&promise_h, me->handler, me->arg);
     }
-    std::cout << "===========" << std::endl;
 
     do {
         me->id = worker::running_workers.load();
@@ -29,8 +40,8 @@ void worker::do_work(void *data) {
         while(job_manager::queues.dequeue(next_job)) {
             set_current_job(next_job);
             if(get_current_job()->status == job_status::UNINITIATED) {
-                get_current_job()->pool = &me->fiber_pool;
-                get_current_job()->context = me->fiber_pool.request();
+                get_current_job()->pool = &fiber_pool;
+                get_current_job()->context = fiber_pool.request();
                 reset_fiber(get_current_job()->context, job::execute, get_current_job());
                 get_current_job()->status = job_status::RUNNING;
             } else
@@ -43,7 +54,7 @@ void worker::do_work(void *data) {
 
             // std::cout << current_job->context << std::endl;
         
-            switch_to_fiber(me->thread_fib, get_current_job()->context);
+            switch_to_fiber(thread_fib, get_current_job()->context);
 
             // printf("worker %i return from job %p...\n", me->id, get_current_job());
             get_current_job()->lock.unlock();
@@ -60,17 +71,17 @@ void worker::init_worker(void *data) {
 
     worker* me = reinterpret_cast<worker*>(data);
     current_worker = me;
-    me->thread_fib = create_fiber();
-    convert_thread_to_fiber(me->thread_fib, worker::do_work, data);
-    destroy_fiber(me->thread_fib);
+    thread_fib = create_fiber();
+    convert_thread_to_fiber(thread_fib, worker::do_work, data);
+    destroy_fiber(thread_fib);
 }
 
-worker::worker(void(*handler)(void*), void* arg): arg{arg}, handler{handler}, thread_fib{nullptr}, fiber_pool{}, _thread{nullptr} {
+worker::worker(void(*handler)(void*), void* arg): arg{arg}, handler{handler}, _thread{nullptr} {
     this->_thread = new thread(worker::init_worker, this);
 }
     
 
-worker::worker(): arg{nullptr}, handler{nullptr}, thread_fib{nullptr}, fiber_pool{}, _thread{nullptr} {}
+worker::worker(): arg{nullptr}, handler{nullptr}, _thread{nullptr} {}
     
 
 
@@ -103,7 +114,7 @@ void worker::all_workers::begin() {
 }
 
 void return_to_worker() {
-    switch_to_fiber(get_current_fiber(), current_worker->thread_fib);
+    switch_to_fiber(get_current_fiber(), thread_fib);
 }
 
 void notify_caller(job* job) {

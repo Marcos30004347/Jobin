@@ -46,3 +46,13 @@ project(job_test)
 add_executable(job_test job.cpp)
 target_link_libraries(job_test jobin)
 add_test(NAME job COMMAND job_test)
+
+project(ring_buffer_test)
+add_executable(ring_buffer_test ring_buffer.cpp)
+target_link_libraries(ring_buffer_test jobin)
+add_test(NAME ring_buffer COMMAND ring_buffer_test)
+
+project(jobin_test)
+add_executable(jobin_test jobin.cpp)
+target_link_libraries(jobin_test jobin)
+add_test(NAME jobin COMMAND jobin_test)

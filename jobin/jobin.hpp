@@ -1,8 +1,9 @@
 #ifndef JOBIN_SYSTEM_H
 #define JOBIN_SYSTEM_H
 
-#include "job_manager.hpp"
+#include<iostream>
 #include "worker.hpp"
+#include "job_manager.hpp"
 
 namespace jobin {
 
@@ -12,28 +13,23 @@ namespace {
 };
 
 template<typename T, typename ...Args>
-static promise<T>* async(T(*handle)(Args...) ,Args... args) {
-    return job_manager::get_ptr()->enqueue_job<T, Args...>(handle, args...);
+static void async(promise<T>* p, T(*handle)(Args...) ,Args... args) {
+    return job_manager::enqueue_job<T, Args...>(p, handle, args...);
 }
 
 template<typename T, typename ...Args>
-static promise<T>* async(T(*handle)(Args...), std::tuple<Args...> args[], unsigned int count) {
-    return job_manager::get_ptr()->enqueue_jobs<T, Args...>(handle, args, count);
+static void async(promise<T>* p, T(*handle)(Args...), std::tuple<Args...> args[], unsigned int count) {
+    return job_manager::enqueue_jobs<T, Args...>(p, handle, args, count);
 }
 
 template<typename T, typename ...Args>
-static promise<T>* sync(T(*handle)(Args...), Args... args) {
-    return job_manager::get_ptr()->enqueue_and_wait_jobs(handle, std::tuple<Args...>(args...), 1);
+static void sync(promise<T>* p, T(*handle)(Args...), Args... args) {
+    return job_manager::enqueue_job_and_wait(p, handle, args...);
 }
 
 template<typename T, typename ...Args>
-static promise<T>* sync(T(*handle)(Args...), std::tuple<Args...> args[], unsigned int count) {
-    return job_manager::get_ptr()->enqueue_jobs_and_wait(handle, args, count);
-}
-
-template<typename T>
-static void wait(promise<T>* p) {
-    return job_manager::get_ptr()->wait_promise(p);
+static void sync(promise<T>* p, T(*handle)(Args...), std::tuple<Args...> args[], unsigned int count) {
+    return job_manager::enqueue_jobs_and_wait(p, handle, args, count);
 }
 
 static void done() {
@@ -43,11 +39,12 @@ static void done() {
 static void init(void(*handler)(void* data), void* data) {
     workers_count = thread::hardware_concurrency();
     workers = (worker**)malloc(sizeof(worker*)*workers_count - 1);
-        
-    workers[0] = new worker(handler, data);
-    for(int i=1; i<workers_count; i++) {
+
+    for(int i=0; i<workers_count - 1; i++) {
         workers[i] = new worker();
     }
+
+    worker::convert_thread_to_worker(handler, data);
 }
 
 static void wait_jobs() {
@@ -56,11 +53,12 @@ static void wait_jobs() {
     }
 }
 
+
 static void shut_down() {
-    for(int i=1; i<workers_count; i++) {
-        workers[i]->~worker();
-    }
-    delete workers;
+    for(int i=0; i<workers_count - 1; i++) {
+        delete workers[i];
+    }  
+    // delete workers;
 }
 
 };

@@ -5,12 +5,25 @@
 
 #include "fiber.hpp"
 #include "fiber_pool_fixed.hpp"
-#include "enums.hpp"
 #include "spin_lock.hpp"
 #include "promise_resolver.hpp"
+#include "waiting_job.hpp"
+
+enum job_prioriry {
+    HIGH,
+    MEDIUM,
+    LOW
+};
+
+enum job_status {
+    UNINITIATED = 0,
+    WAITING,
+    RUNNING,
+    FINISHING,
+};
+
 
 class job;
-class waiting_job;
 
 void return_to_worker();
 void notify_caller(job* job);

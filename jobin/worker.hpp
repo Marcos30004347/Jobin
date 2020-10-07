@@ -3,8 +3,7 @@
 
 #include "job.hpp"
 #include "thread.hpp"
-#include "fiber_pool_fixed.hpp"
-#include "job_manager.hpp"
+
 
 class worker;
 
@@ -28,10 +27,6 @@ private:
      */
     thread* _thread = nullptr;
 
-    /**
-     * thread context of execution.
-     */
-    fiber* thread_fib = nullptr;
 
     /**
      * flag that signal if workers can stop pooling jobs.
@@ -43,10 +38,6 @@ private:
      */
     static atomic<unsigned int> running_workers;
 
-    /**
-     * worker fiber pool.
-     */
-    fiber_pool_fixed<256> fiber_pool;
 
     /**
      * worker id.

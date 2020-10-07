@@ -4,6 +4,8 @@
 #include <tuple>
 #include <type_traits>
 
+
+extern void current_job_yield();
 template <typename T> struct trait {
     typedef T type;
     T value = T();
@@ -22,7 +24,6 @@ template <> struct trait<void> {
     trait(trait<void>&& other) {}
 };
 
-extern void current_job_yield();
 
 template<typename T>
 class promise {
@@ -61,21 +62,5 @@ public:
     }
 };
 
-template<typename Ret>
-class promises {
-    promises<Ret>* ps;
-public:
-    promises(unsigned int s) {
-        ps = new promises<Ret>[s];
-    }
-
-    ~promises() {
-        delete ps;
-    }
-
-    promise<Ret> operator[](unsigned int i) {
-        return ps[i];
-    }
-};
 
 #endif

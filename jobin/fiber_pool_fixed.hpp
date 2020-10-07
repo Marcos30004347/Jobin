@@ -67,9 +67,6 @@ template<unsigned int size>
 fiber* fiber_pool_fixed<size>::request() {
     unsigned int id;
     while(!avaliable_ids.get_avaliable(id)) {}
-
-    // value = buff + id;
-    // reset_fiber(value, handle, args);
     return buff + id;
 }
 

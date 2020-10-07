@@ -7,7 +7,6 @@
 #include <iostream>
 
 
-
 int main() {
 
     promise<int> promise0;

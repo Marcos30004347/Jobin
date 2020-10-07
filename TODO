@@ -1,7 +1,0 @@
-thread backend
-comment code
-fix memory leaks
-add tests
-add job pool
-add job priority
-move implementation details to a cpp 

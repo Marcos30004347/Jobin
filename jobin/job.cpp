@@ -11,14 +11,14 @@ void set_current_job(job* j) noexcept {
 }
 
 void job::execute(void* j) {
-        job* w = reinterpret_cast<job*>(j);
+    job* w = reinterpret_cast<job*>(j);
 
-        w->status = job_status::RUNNING;
+    w->status = job_status::RUNNING;
 
-        w->handler(w->promise_ptr, w->resolver_ptr);
+    w->handler(w->promise_ptr, w->resolver_ptr);
 
-        w->status = job_status::FINISHING;
+    w->status = job_status::FINISHING;
 
-        notify_caller(w);
-        return_to_worker();
-    }
+    notify_caller(w);
+    return_to_worker();
+}

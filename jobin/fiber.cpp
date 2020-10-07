@@ -166,6 +166,7 @@ void convert_thread_to_fiber(fiber* fib, void(*handle)(void*), void* arg) {
     #ifdef FIBER_FCONTEXT_BACKEND
     fib->ctx = make_fcontext(fib->stack.sptr, fib->stack.ssize, fiber_to_thread_entry);
     fib->ctx = jump_fcontext(fib->ctx, fib).ctx;
+
     #elif FIBER_WINDOWS_BACKEND
     ConvertThreadToFiber(nullptr);
     fib->ctx = GetCurrentFiber();

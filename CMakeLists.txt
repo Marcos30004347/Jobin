@@ -43,6 +43,8 @@ jobin/thread.cpp
 jobin/worker.cpp
 jobin/job_manager.cpp
 jobin/job.cpp
+jobin/job_queues.cpp
+jobin/pool_allocator.cpp
 )
 
 target_include_directories(jobin PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
