@@ -1,10 +1,11 @@
 #ifndef JOBIN_WORK_H
 #define JOBIN_WORK_H
 
+#include <string.h>
+
 #include "fiber.hpp"
 #include "fiber_pool_fixed.hpp"
 #include "enums.hpp"
-#include <string.h>
 #include "spin_lock.hpp"
 #include "promise_resolver.hpp"
 
@@ -15,15 +16,16 @@ thread_local static job* current_job = nullptr;
 
 void return_to_worker();
 void notify_caller(job* job);
+void current_job_yield();
 
 using job_invoke_method = unsigned int (*)(void*, void*);
 
-
 class job {
     friend class worker;
-    friend class job_avaliable_queue;
+    friend class job_queues;
     friend class job_manager;
     friend class job_waiting_list;
+    friend class job_avaliable_queue;
     friend void notify_caller(job* job);
 
     waiting_job* waiting_for_me = nullptr;

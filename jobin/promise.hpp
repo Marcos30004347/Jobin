@@ -4,7 +4,7 @@
 #include <tuple>
 #include <type_traits>
 
-
+class job;
 
 template <typename T> struct trait {
     typedef T type;
@@ -24,6 +24,8 @@ template <> struct trait<void> {
     trait(trait<void>&& other) {}
 };
 
+extern void current_job_yield();
+
 template<typename T>
 class promise {
     template<typename Ret, typename... Args>
@@ -32,9 +34,11 @@ class promise {
     friend class job_manager;
     friend class job;
 
-    bool is_resolved = false;
+    job* j;
+
     trait<T> promise_value;
 public:
+    bool is_resolved = false;
 
     promise(): promise_value{} {}
 
@@ -52,10 +56,30 @@ public:
 
     template <typename Ret = T>
     typename std::enable_if<!std::is_void<Ret>::value, Ret>::type
-    value() {
+    value() noexcept {
         return promise_value.value;
     }
 
+    inline void wait() noexcept {
+        while(!this->is_resolved) current_job_yield();
+    }
+};
+
+template<typename Ret>
+class promises {
+    promises<Ret>* ps;
+public:
+    promises(unsigned int s) {
+        ps = new promises<Ret>[s];
+    }
+
+    ~promises() {
+        delete ps;
+    }
+
+    promise<Ret> operator[](unsigned int i) {
+        return ps[i];
+    }
 };
 
 #endif

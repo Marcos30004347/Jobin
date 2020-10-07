@@ -1,7 +1,7 @@
 /*
     @obs: If this file is included it will override the default new and delete operators.
 
-    @opt: if RECORD_ALLOCATED_MEMORY_COUNT is defined, it will have one extra static method:
+    @opt: if TESTS is defined, it will have one extra static method:
         * unsigned int currently_allocated_memory_count()
 */
 
@@ -10,13 +10,13 @@
 
 #include<malloc.h>
 
-#ifdef RECORD_ALLOCATED_MEMORY_COUNT
+#ifdef TESTS
 #include"atomic.hpp"
 #endif
 
 #include<iostream>
 class memory {
-    #ifdef RECORD_ALLOCATED_MEMORY_COUNT
+    #ifdef TESTS
     // current bytes allocated count.
     static atomic<unsigned int> total_memory;
     #endif
@@ -29,9 +29,11 @@ public:
     */
     static void* allocate(size_t size){
 
-        #ifdef RECORD_ALLOCATED_MEMORY_COUNT
+        #ifdef TESTS
         size_t *p = (size_t*)malloc(size + sizeof(size_t));
         p[0] = size;
+        std::cout << "allocate " << size << std::endl;
+
         total_memory.compare_exchange_strong(total_memory.load(), total_memory.load() + size);
         return (void*)(&p[1]);
         #else
@@ -45,10 +47,12 @@ public:
         @param ptr - memory to be deallocated.
     */
     static void deallocate(void* ptr) {
-        #ifdef RECORD_ALLOCATED_MEMORY_COUNT
-
+        #ifdef TESTS
         size_t *p = (size_t*)ptr;
         size_t size = p[-1];
+    
+        std::cout << "deallocate " << size << std::endl;
+    
         total_memory.compare_exchange_strong(total_memory.load(), total_memory.load() - size);
         void *p2 = (void*)(&p[-1]);
         free(p2);
@@ -57,7 +61,7 @@ public:
         #endif
     }
 
-    #ifdef RECORD_ALLOCATED_MEMORY_COUNT
+    #ifdef TESTS
     /*
         Return current allocated bytes count.
     */
@@ -67,7 +71,7 @@ public:
     #endif
 };
 
-#ifdef RECORD_ALLOCATED_MEMORY_COUNT
+#ifdef TESTS
 atomic<unsigned int> memory::total_memory{0};
 #endif
 

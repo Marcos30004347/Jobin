@@ -43,6 +43,7 @@ public:
 
 template<typename... Args>
 class promise_resolver<void, Args...> {
+    friend class job;
 private:
     std::tuple<Args...> arguments;
     void(*handle)(Args...);

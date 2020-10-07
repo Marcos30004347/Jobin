@@ -19,7 +19,7 @@ int print_numbers() {
     return 0;
 }
 
-int init_system(void* data) {
+void init_system(void* data) {
     promise<int>** p3 = new promise<int>*[10];
 
     for(int i=0; i<10; i++) {
@@ -30,7 +30,7 @@ int init_system(void* data) {
         wait(p3[i]);
     }
 
-    return done(3);
+    done();
 }
 
 

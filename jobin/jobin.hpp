@@ -28,7 +28,7 @@ static promise<T>* sync(T(*handle)(Args...), Args... args) {
 
 template<typename T, typename ...Args>
 static promise<T>* sync(T(*handle)(Args...), std::tuple<Args...> args[], unsigned int count) {
-    return job_manager::get_ptr()->enqueue_and_wait_jobs(handle, args, count);
+    return job_manager::get_ptr()->enqueue_jobs_and_wait(handle, args, count);
 }
 
 template<typename T>
@@ -36,9 +36,8 @@ static void wait(promise<T>* p) {
     return job_manager::get_ptr()->wait_promise(p);
 }
 
-static int done(int i) {
+static void done() {
     worker::all_workers::done();
-    return i;
 }
 
 static void init(void(*handler)(void* data), void* data) {

@@ -26,7 +26,7 @@ private:
     /**
      * _thread of execution of this worker.
      */
-    thread _thread;
+    thread* _thread = nullptr;
 
     /**
      * thread context of execution.
@@ -65,24 +65,18 @@ private:
      */
     static void do_work(void *data) {
         worker* me = reinterpret_cast<worker*>(data);
-        // current_job = (job*)malloc(sizeof(job));
-        // current_job->context = me->thread_fib;
-        // current_job->waiting_for_me = nullptr;
-
-        if(me->handler && me->global_manager) {
-            me->global_manager->enqueue_job<void, void*>(me->handler, me->arg);
-        }
-
+        promise<void>* promise_h = nullptr;
+        if(me->handler && me->global_manager) { promise_h = me->global_manager->enqueue_job<void, void*>(me->handler, me->arg);}
+    
         do { me->id = worker::running_workers.load(); } while(!worker::running_workers.compare_exchange_weak(me->id, me->id+1));
         
         
-        while(worker::running_workers.load() < thread::hardware_concurrency()) {}
+        // while(worker::running_workers.load() < thread::hardware_concurrency()) {}
 
         thread::this_thread::set_affinity(me->id);
     
-        while(should_pool && me->global_manager) {
-            while(me->global_manager->high_priority_queue.dequeue(current_job) || me->global_manager->medium_priority_queue.dequeue(current_job) || me->global_manager->low_priority_queue.dequeue(current_job)) {
-
+        while(worker::should_pool && me->global_manager) {
+            while(me->global_manager->jobs.dequeue(current_job)) {
                 if(current_job->status == job_status::UNINITIATED) {
                     current_job->pool = &me->fiber_pool;
                     current_job->context = me->fiber_pool.request();
@@ -107,7 +101,7 @@ private:
 
             }
         }
-
+        if(promise_h) delete promise_h;
         // printf("worker %i is finishing...\n", me->id);
     }
 
@@ -120,7 +114,6 @@ private:
         current_worker = me;
         me->thread_fib = create_fiber();
         me->global_manager = job_manager::get_ptr();
-
         convert_thread_to_fiber(me->thread_fib, worker::do_work, data);
         destroy_fiber(me->thread_fib);
     }
@@ -131,25 +124,27 @@ public:
      * @param handler: worker initial job;
      * @param arg: initial argument.
      */
-    worker(void(*handler)(void*), void* arg): arg{arg}, handler{handler}, thread_fib{nullptr}, fiber_pool{}, _thread{worker::init_worker, this } {}
+    worker(void(*handler)(void*), void* arg): arg{arg}, handler{handler}, thread_fib{nullptr}, fiber_pool{}, _thread{nullptr} {
+        this->_thread = new thread(worker::init_worker, this);
+    }
     
     /**
      * worker contructor.
      * @note: this contrutor dont dispatch any initial job.
      */
-    worker(): arg{nullptr}, handler{nullptr}, thread_fib{nullptr}, fiber_pool{}, _thread{worker::init_worker, this } {}
+    worker(): arg{nullptr}, handler{nullptr}, thread_fib{nullptr}, fiber_pool{}, _thread{nullptr} {}
     
 
     /**
      * wait for current worker to return.
      */
-    void wait() { _thread.join(); }
+    void wait() { _thread->join(); }
 
     /**
      * worker destructor.
      */
     ~worker() {
-        this->_thread.~thread();
+        delete _thread;
     }
 
 
@@ -161,6 +156,7 @@ public:
         me->handler = handler;
         me->arg = arg;
         worker::init_worker(me);
+        delete me;
     }
 
     class all_workers {
@@ -187,5 +183,9 @@ void notify_caller(job* job) {
     job_manager::get_ptr()->notify(job->waiting_for_me);
 }
 
+void current_job_yield() {
+    job_manager::get_ptr()->jobs.enqueue(current_job);
+    return_to_worker();
+}
 
 #endif

@@ -1,6 +1,6 @@
 #include "jobin/promise.hpp"
 
-#define RECORD_ALLOCATED_MEMORY_COUNT
+#define TESTS
 #include "jobin/memory.hpp"
 
 #include <assert.h>

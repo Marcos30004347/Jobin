@@ -19,72 +19,48 @@ public:
     ~waiting_job() {}
 };
 
-
-template<typename... Args>
-class artuments_pack {
-    friend class job_manager;
+#include<iostream>
+class job_queues {
 private:
-    std::tuple<Args...> arguments;
-
-public:
-    artuments_pack(Args ... values) {
-        arguments = std::tuple<Args...>(values...);
-    }
-    artuments_pack() {}
-};
-
-
-class job_manager {
-public:
     job_priority_queue high_priority_queue;
     job_priority_queue medium_priority_queue;
     job_priority_queue low_priority_queue;
 
-    // waiting_job* waiting_list; 
-    spin_lock system_lock;
+public:
+    job_queues() {}
 
-    static job_manager* singleton_ptr;
-
-    job_manager() {}
-
-    ~job_manager() {
+    ~job_queues() {
         job* j;
-    
-        while(singleton_ptr->high_priority_queue.dequeue(j)) { delete j; }
-        while(singleton_ptr->medium_priority_queue.dequeue(j)) { delete j; }
-        while(singleton_ptr->low_priority_queue.dequeue(j)) { delete j; }
+        // while(high_priority_queue.dequeue(j)) { j->~job(); }
+        // while(medium_priority_queue.dequeue(j)) { j->~job(); }
+        // while(low_priority_queue.dequeue(j)) { j->~job(); }
     }
 
-    static void init() {
-        singleton_ptr = new job_manager();
-    }
-    
-    static void shut_down() {
-        // singleton_ptr->~job_manager();
-        delete singleton_ptr;
-    }
-    
-
-    static job_manager* get_ptr() {
-        return singleton_ptr;
+    bool enqueue(job* j) {
+        if(j->priority == job_prioriry::HIGH) return high_priority_queue.enqueue(j);
+        else if(j->priority == job_prioriry::MEDIUM) return medium_priority_queue.enqueue(j);
+        else return low_priority_queue.enqueue(j);
     }
 
+    bool dequeue(job* &j) {
+        if(high_priority_queue.dequeue(j)) return true;
+        else if(medium_priority_queue.dequeue(j)) return true;
+        else return low_priority_queue.dequeue(j);
+    }
+};
 
+
+class job_manager {
+    friend class worker;
+    friend void current_job_yield();
+    friend void notify_caller(job* job);
+
+    job_queues jobs;
+
+private:
     waiting_job* put_to_wait(job* w, int waiting_for) {
         waiting_job* waiting = new waiting_job(w, waiting_for);
         
-        // system_lock.lock();
-
-        // if(waiting_list) {
-        //     waiting_list->next = waiting;
-        //     waiting->parent = waiting_list;
-        //     waiting_list = waiting;
-        // } else {
-        //     waiting_list = waiting;
-        // }
-
-        // system_lock.unlock();
-
         return waiting; 
     }
 
@@ -95,37 +71,29 @@ public:
         } while(!ref->waiting_for.compare_exchange_weak(waiting, waiting - 1));
 
         if(waiting <= 1) {
-            put_to_run(ref);
+            jobs.enqueue(ref->ref);        
+            delete ref;
         }
     }
 
-    void put_to_run(waiting_job* node) {
-        if(node->ref->priority == job_prioriry::HIGH) high_priority_queue.enqueue(node->ref);
-        else if(node->ref->priority == job_prioriry::MEDIUM) medium_priority_queue.enqueue(node->ref);
-        else if(node->ref->priority == job_prioriry::LOW) low_priority_queue.enqueue(node->ref);
-        
-        // system check
-        // system_lock.lock();
-        // if(node->ref == waiting_list) {
-        //     waiting_list = waiting_list->next;
-        // }
 
-        // if(node->parent) node->parent->next = node->next;
-        // if(node->next) node->next->parent = node->parent;
-        // system_lock.unlock();
+public:
+    spin_lock system_lock;
 
-        delete node;
-    }
+    static job_manager* singleton_ptr;
+
+    job_manager() {}
+    ~job_manager() {}
+
+    inline static void init() noexcept { singleton_ptr = new job_manager(); }
+    inline static void shut_down() noexcept { delete singleton_ptr; }
+    inline static job_manager* get_ptr() noexcept { return singleton_ptr; }
 
     template<typename Ret, typename ...Args>
     promise<Ret>* enqueue_job(Ret(*handle)(Args...), Args... args) {
         promise<Ret>* prm = new promise<Ret>;
         job* _j = new job(prm, handle, args...);
-
-        if(_j->priority == job_prioriry::HIGH) high_priority_queue.enqueue(_j);
-        else if(_j->priority == job_prioriry::MEDIUM) medium_priority_queue.enqueue(_j);
-        else if(_j->priority == job_prioriry::LOW) low_priority_queue.enqueue(_j);
-
+        jobs.enqueue(_j);
         return prm;
     }
 
@@ -135,20 +103,15 @@ public:
         job* _j;
 
         for(int i=0; i<count; i++) {
-
             _j = new job(&promises[i], handle, args[i]);
-
-            if(_j->priority == job_prioriry::HIGH) high_priority_queue.enqueue(_j);
-            else if(_j->priority == job_prioriry::MEDIUM) medium_priority_queue.enqueue(_j);
-            else if(_j->priority == job_prioriry::LOW) low_priority_queue.enqueue(_j);
+            jobs.enqueue(_j);
         }
 
         return promises;
     }
 
-
     template<typename Ret, typename ...Args>
-    promise<Ret>* enqueue_and_wait_jobs(Ret(*handle)(Args...), std::tuple<Args...> args[], unsigned int count) {
+    promise<Ret>* enqueue_jobs_and_wait(Ret(*handle)(Args...), std::tuple<Args...> args[], unsigned int count) {
         waiting_job* ref = put_to_wait(current_job, count);
         promise<Ret>* promises = new promise<Ret>[count];
 
@@ -157,10 +120,7 @@ public:
         for(int i=0; i<count; i++) {
             _j = new job(&promises[i], handle, args[i]);
             _j->waiting_for_me = ref;
-
-            if(_j->priority == job_prioriry::HIGH) high_priority_queue.enqueue(_j);
-            else if(_j->priority == job_prioriry::MEDIUM) medium_priority_queue.enqueue(_j);
-            else if(_j->priority == job_prioriry::LOW) low_priority_queue.enqueue(_j);
+            jobs.enqueue(_j);
         }
 
         return_to_worker();
@@ -168,20 +128,22 @@ public:
         return promises;
     }
 
-    void yield() {
-        if(current_job->priority == job_prioriry::HIGH) high_priority_queue.enqueue(current_job);
-        else if(current_job->priority == job_prioriry::MEDIUM) medium_priority_queue.enqueue(current_job);
-        else if(current_job->priority == job_prioriry::LOW) low_priority_queue.enqueue(current_job);
+
+    template<typename Ret, typename ...Args>
+    promise<Ret>* enqueue_job_and_wait(Ret(*handle)(Args...), Args... args) {
+        waiting_job* ref = put_to_wait(current_job, 1);
+        promise<Ret>* p = new promise<Ret>();
+
+        job* _j;
+    
+        _j = new job(p, handle, args...);
+        _j->waiting_for_me = ref;
+
+        jobs.enqueue(_j);
         return_to_worker();
-    }
 
-    template<typename Ret>
-    void wait_promise(promise<Ret>* p) {
-        while (!p->is_resolved) {
-            yield();
-        }
+        return p;
     }
-
 };
 
 job_manager* job_manager::singleton_ptr = nullptr;

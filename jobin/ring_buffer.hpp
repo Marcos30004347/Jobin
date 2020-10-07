@@ -2,7 +2,6 @@
 #define JOBIN_RING_BUFFER_H
 
 #include "spin_lock.hpp"
-// #include<mutex>
 #include<iostream>
 
 template<typename T, unsigned int size>
@@ -10,7 +9,6 @@ class ring_buffer {
 
     T buff[size];
     spin_lock mutex;
-    // std::mutex mutex;
 
     unsigned int top,tail;
     public:
@@ -43,7 +41,6 @@ bool ring_buffer<T,size>::enqueue(const T& data) {
     return true;
 }
 
-#include<stdio.h>
 
 template<typename T, unsigned int size>
 bool ring_buffer<T,size>::dequeue(T& value) {
@@ -52,10 +49,8 @@ bool ring_buffer<T,size>::dequeue(T& value) {
         mutex.unlock();
         return false;
     }
-
     value = buff[tail];
     tail = (tail + 1)%(size+1);
-
     mutex.unlock();
     return true;
 }

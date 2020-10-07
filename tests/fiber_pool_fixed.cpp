@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <iostream>
 
-#define RECORD_ALLOCATED_MEMORY_COUNT
+#define TESTS
 #include "jobin/memory.hpp"
 
 
