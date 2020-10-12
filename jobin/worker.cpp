@@ -21,7 +21,7 @@ void worker::do_work(void *data) {
     promise<void> promise_h;
     promise<void> promise_c;
     if(me->handler) {
-        job_manager::enqueue_job<void, void*>(&promise_h, me->handler, me->arg);
+        job_manager::enqueue_job<void, void*>(&promise_h, me->handler, std::move(me->arg));
     }
 
     do {

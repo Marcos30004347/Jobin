@@ -71,14 +71,14 @@ class job {
      * @param args: job arguments.
      */
     template<typename Ret, typename ...Args>
-    job(promise<Ret>* promise, Ret(*handle)(Args...), Args... args): status{UNINITIATED}, priority{HIGH} {
-        promise_resolver<Ret, Args...>* resolver = (promise_resolver<Ret, Args...>*)malloc(sizeof(promise_resolver<Ret, Args...>));
-        resolver->handle = handle;
-        resolver->set_args(std::forward<Args>(args)...);
+    job(promise<Ret>* promise, Ret(*handle)(Args...), Args&&... args): status{UNINITIATED}, priority{HIGH} {
+        promise_resolver<Ret, Args...>* resolver = new promise_resolver<Ret, Args...>(handle, std::forward<Args>(args)...);
         resolver_ptr = resolver;
         promise_ptr = promise;
         handler = reinterpret_cast<job_invoke_method>(resolver->resolve_with_resolver);
     }
+
+
 
     /**
      * job contructor.
@@ -88,9 +88,7 @@ class job {
      */
     template<typename Ret, typename ...Args>
     job(promise<Ret>* promise, Ret(*handle)(Args...), std::tuple<Args...> args): status{UNINITIATED}, priority{HIGH} {
-        promise_resolver<Ret, Args...>* resolver = (promise_resolver<Ret, Args...>*)malloc(sizeof(promise_resolver<Ret, Args...>));
-        resolver->handle = handle;
-        resolver->set_args(std::forward<std::tuple<Args...>>(args));
+        promise_resolver<Ret, Args...>* resolver = new promise_resolver<Ret, Args...>(handle, std::forward<std::tuple<Args...>>(args));
         resolver_ptr = resolver;
         promise_ptr = promise;
         handler = reinterpret_cast<job_invoke_method>(resolver->resolve_with_resolver);
@@ -102,7 +100,7 @@ class job {
      * job destructor.
      */
     ~job() {
-        free(resolver_ptr);
+        delete (unsigned int*)resolver_ptr;
     }
 
 };

@@ -11,6 +11,13 @@ int handle(int a, int b) {
     return a+b;
 }
 
+int handle2(int &a, int &b) {
+    a = 0;
+    b = 0;
+    return a+b;
+}
+
+
 void worker_handler(void* data) {
 
 
@@ -26,26 +33,31 @@ void worker_handler(void* data) {
 
 
     job_manager::enqueue_job_and_wait(&p, handle, 1, 2);
-
     assert(p.value() == 3);
 
+    int a = 3; 
+    int b = 3;
+    job_manager::enqueue_job_and_wait<int, int&, int&>(&p, handle2, a, b);
+    assert(a == 0);
+    assert(b == 0);
 
-    std::tuple<int, int> args[2];
-    promise<int> ps[2]; 
 
-    args[0] = {1, 2};
-    args[1] = {2, 3};
+    // std::tuple<int, int> args[2];
+    // promise<int> ps[2]; 
 
-    job_manager::enqueue_jobs(ps, handle, args, 2);
-    ps[0].wait();
-    ps[1].wait();
+    // args[0] = {1, 2};
+    // args[1] = {2, 3};
 
-    assert(ps[0].value() == 3);
-    assert(ps[1].value() == 5);
+    // job_manager::enqueue_jobs(ps, handle, args, 2);
+    // ps[0].wait();
+    // ps[1].wait();
 
-    job_manager::enqueue_jobs_and_wait(ps, handle, args, 2);
-    assert(ps[0].value() == 3);
-    assert(ps[1].value() == 5);
+    // assert(ps[0].value() == 3);
+    // assert(ps[1].value() == 5);
+
+    // job_manager::enqueue_jobs_and_wait(ps, handle, args, 2);
+    // assert(ps[0].value() == 3);
+    // assert(ps[1].value() == 5);
 
 
     worker::all_workers::done();

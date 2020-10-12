@@ -15,24 +15,24 @@ void init_system(void* data) {
     p.wait();
     assert(p.value() == sum(1,2));
 
-    promise<int> ps[2];
-    std::tuple<int, int> args[2];
-    args[0] = {1,2};
-    args[1] = {2,3};
+    // promise<int> ps[2];
+    // std::tuple<int, int> args[2];
+    // args[0] = {1,2};
+    // args[1] = {2,3};
 
-    jobin::async(ps, sum, args, 2);
-    ps[0].wait();
-    ps[1].wait();
+    // jobin::async(ps, sum, args, 2);
+    // ps[0].wait();
+    // ps[1].wait();
 
-    assert(ps[0].value() == sum(1,2));
-    assert(ps[1].value() == sum(2,3));
+    // assert(ps[0].value() == sum(1,2));
+    // assert(ps[1].value() == sum(2,3));
 
-    jobin::sync(&p, sum, 1, 2);
-    assert(p.value() == sum(1,2));
+    // jobin::sync(&p, sum, 1, 2);
+    // assert(p.value() == sum(1,2));
 
-    jobin::sync(ps, sum, args, 2);
-    assert(ps[0].value() == sum(1,2));
-    assert(ps[1].value() == sum(2,3));
+    // jobin::sync(ps, sum, args, 2);
+    // assert(ps[0].value() == sum(1,2));
+    // assert(ps[1].value() == sum(2,3));
 
     jobin::done();
 }

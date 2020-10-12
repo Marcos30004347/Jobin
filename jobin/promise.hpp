@@ -24,7 +24,6 @@ template <> struct trait<void> {
     trait(trait<void>&& other) {}
 };
 
-
 template<typename T>
 class promise {
     template<typename Ret, typename... Args>
@@ -61,6 +60,7 @@ public:
         while(!this->is_resolved) current_job_yield();
     }
 };
+
 
 
 #endif

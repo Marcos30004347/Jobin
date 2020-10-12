@@ -13,24 +13,24 @@ namespace {
 };
 
 template<typename T, typename ...Args>
-static void async(promise<T>* p, T(*handle)(Args...) ,Args... args) {
-    return job_manager::enqueue_job<T, Args...>(p, handle, args...);
+static void async(promise<T>* p, T(*handle)(Args...) ,Args&&... args) {
+    return job_manager::enqueue_job<T, Args...>(p, handle, std::forward<Args>(args)...);
 }
 
-template<typename T, typename ...Args>
-static void async(promise<T>* p, T(*handle)(Args...), std::tuple<Args...> args[], unsigned int count) {
-    return job_manager::enqueue_jobs<T, Args...>(p, handle, args, count);
-}
+// template<typename T, typename ...Args>
+// static void async(promise<T>* p, T(*handle)(Args...), std::tuple<Args...> args[], unsigned int count) {
+//     return job_manager::enqueue_jobs<T, Args...>(p, handle, args, count);
+// }
 
 template<typename T, typename ...Args>
-static void sync(promise<T>* p, T(*handle)(Args...), Args... args) {
-    return job_manager::enqueue_job_and_wait(p, handle, args...);
+static void sync(promise<T>* p, T(*handle)(Args...), Args&&... args) {
+    return job_manager::enqueue_job_and_wait(p, handle, std::forward<Args>(args)...);
 }
 
-template<typename T, typename ...Args>
-static void sync(promise<T>* p, T(*handle)(Args...), std::tuple<Args...> args[], unsigned int count) {
-    return job_manager::enqueue_jobs_and_wait(p, handle, args, count);
-}
+// template<typename T, typename ...Args>
+// static void sync(promise<T>* p, T(*handle)(Args...), std::tuple<Args...> args[], unsigned int count) {
+//     return job_manager::enqueue_jobs_and_wait(p, handle, args, count);
+// }
 
 static void done() {
     worker::all_workers::done();
