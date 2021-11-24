@@ -5,7 +5,7 @@
 #ifndef JOBIN_MEMORY_H
 #define JOBIN_MEMORY_H
 
-#include<malloc.h>
+#include<stdlib.h>
 
 #ifdef TESTS
 #include"atomic.hpp"

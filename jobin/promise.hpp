@@ -36,7 +36,7 @@ class promise {
 public:
     bool is_resolved = false;
 
-    promise(): promise_value{} {}
+    promise() {}
 
     bool has_valid_return() {
         return promise_value.has_valid_value;

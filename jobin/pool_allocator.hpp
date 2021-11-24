@@ -1,7 +1,7 @@
 #ifndef JOBIN_POOL_ALLOCATOR_H
 #define JOBIN_POOL_ALLOCATOR_H
 
-#include <malloc.h>
+#include <string.h>
 #include "spin_lock.hpp"
 
 struct memory_chunk {

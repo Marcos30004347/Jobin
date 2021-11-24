@@ -1,0 +1,122 @@
+[
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/.  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/jobin.dir/jobin/fiber.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/jobin/fiber.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/jobin/fiber.cpp"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/.  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/jobin.dir/jobin/mutex.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/jobin/mutex.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/jobin/mutex.cpp"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/.  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/jobin.dir/jobin/spin_lock.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/jobin/spin_lock.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/jobin/spin_lock.cpp"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/.  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/jobin.dir/jobin/thread.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/jobin/thread.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/jobin/thread.cpp"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/.  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/jobin.dir/jobin/worker.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/jobin/worker.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/jobin/worker.cpp"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/.  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/jobin.dir/jobin/job_manager.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/jobin/job_manager.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/jobin/job_manager.cpp"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/.  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/jobin.dir/jobin/job.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/jobin/job.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/jobin/job.cpp"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/.  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/jobin.dir/jobin/job_queues.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/jobin/job_queues.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/jobin/job_queues.cpp"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/.  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/jobin.dir/jobin/pool_allocator.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/jobin/pool_allocator.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/jobin/pool_allocator.cpp"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build/third-party/fcontext",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/cc -DBOOST_CONTEXT_EXPORT=\"\" -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include/fcontext  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -o CMakeFiles/fcontext.dir/source/stack.c.o -c /Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/source/stack.c",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/source/stack.c"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build/third-party/fcontext",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/cc -DBOOST_CONTEXT_EXPORT=\"\" -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include/fcontext  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -o CMakeFiles/fcontext.dir/asm/make_combined_all_macho_gas.S.o -c /Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/asm/make_combined_all_macho_gas.S",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/asm/make_combined_all_macho_gas.S"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build/third-party/fcontext",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/cc -DBOOST_CONTEXT_EXPORT=\"\" -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include/fcontext  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -o CMakeFiles/fcontext.dir/asm/jump_combined_all_macho_gas.S.o -c /Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/asm/jump_combined_all_macho_gas.S",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/asm/jump_combined_all_macho_gas.S"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build/third-party/fcontext",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/cc -DBOOST_CONTEXT_EXPORT=\"\" -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include/fcontext  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -o CMakeFiles/fcontext.dir/asm/ontop_combined_all_macho_gas.S.o -c /Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/asm/ontop_combined_all_macho_gas.S",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/asm/ontop_combined_all_macho_gas.S"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build/tests",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/. -I/Users/marcosvinicius/Workspace/Jobin  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/job_manager_test.dir/job_manager.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/tests/job_manager.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/tests/job_manager.cpp"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build/tests",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/. -I/Users/marcosvinicius/Workspace/Jobin  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/thread_test.dir/thread.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/tests/thread.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/tests/thread.cpp"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build/tests",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/. -I/Users/marcosvinicius/Workspace/Jobin  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/atomic_test.dir/atomic.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/tests/atomic.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/tests/atomic.cpp"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build/tests",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/. -I/Users/marcosvinicius/Workspace/Jobin  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/fiber_test.dir/fiber.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/tests/fiber.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/tests/fiber.cpp"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build/tests",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/. -I/Users/marcosvinicius/Workspace/Jobin  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/worker_test.dir/worker.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/tests/worker.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/tests/worker.cpp"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build/tests",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/. -I/Users/marcosvinicius/Workspace/Jobin  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/promise_resolver_test.dir/promise_resolver.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/tests/promise_resolver.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/tests/promise_resolver.cpp"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build/tests",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/. -I/Users/marcosvinicius/Workspace/Jobin  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/ring_buffer_test.dir/ring_buffer.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/tests/ring_buffer.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/tests/ring_buffer.cpp"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build/tests",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/. -I/Users/marcosvinicius/Workspace/Jobin  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/promise_test.dir/promise.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/tests/promise.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/tests/promise.cpp"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build/tests",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/. -I/Users/marcosvinicius/Workspace/Jobin  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/fiber_pool_fixed_test.dir/fiber_pool_fixed.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/tests/fiber_pool_fixed.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/tests/fiber_pool_fixed.cpp"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build/tests",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/. -I/Users/marcosvinicius/Workspace/Jobin  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/job_test.dir/job.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/tests/job.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/tests/job.cpp"
+},
+{
+  "directory": "/Users/marcosvinicius/Workspace/Jobin/build/tests",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/marcosvinicius/Workspace/Jobin/jobin -I/Users/marcosvinicius/Workspace/Jobin/third-party/fcontext/include -I/Users/marcosvinicius/Workspace/Jobin/third-party/cross-fiber/. -I/Users/marcosvinicius/Workspace/Jobin  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/jobin_test.dir/jobin.cpp.o -c /Users/marcosvinicius/Workspace/Jobin/tests/jobin.cpp",
+  "file": "/Users/marcosvinicius/Workspace/Jobin/tests/jobin.cpp"
+}
+]

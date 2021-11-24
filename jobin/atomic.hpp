@@ -9,9 +9,9 @@ private:
     std::atomic<T> _atomic;
 
 public:
-    atomic(T initial): _atomic{initial} {}
+		atomic(T initial): _atomic(initial) {}
 
-    atomic(): _atomic{} {}
+    atomic() {}
 
     ~atomic() {}
 

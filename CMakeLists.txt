@@ -27,11 +27,14 @@ else()
 add_subdirectory(third-party/cross-fiber)
 add_subdirectory(third-party/fcontext)
 
+include_directories(jobin third-party/fcontext/include)
+
 find_package(Threads REQUIRED)
 
 link_libraries(cross-fiber)
 link_libraries(fcontext)
 link_libraries(Threads::Threads)
+
 
 endif()
 
