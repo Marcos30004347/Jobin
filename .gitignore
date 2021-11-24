@@ -6,3 +6,5 @@ sandbox/
 android/
 android-build/
 .ignore/
+.clangd/
+compile_commands.json
